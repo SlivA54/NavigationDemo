@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             NavigationDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen()
+                    MainScreen(modifier = Modifier.padding(innerPadding)) // Добавьте modifier
                 }
             }
         }
