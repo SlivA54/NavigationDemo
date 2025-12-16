@@ -1,4 +1,4 @@
-package com.example.navigationdemo
+package com.example.navigationdemo.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,14 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-// Profile.kt
 @Composable
-fun Profile(onClearBackStack: () -> Unit) {
+fun Profile(onGoHome: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Setup your profile", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                text = "Setup your profile",
+                style = MaterialTheme.typography.headlineSmall
+            )
             Spacer(modifier = Modifier.size(30.dp))
-            Button(onClick = { onClearBackStack() }) { Text("Go Home") }
+            Button(onClick = onGoHome) {
+                Text("Go Home")
+            }
         }
     }
 }

@@ -11,12 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entry
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.ui.NavDisplay
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.navigationdemo.screens.Home
+import com.example.navigationdemo.screens.Profile
+import com.example.navigationdemo.screens.Welcome
 import com.example.navigationdemo.ui.theme.NavigationDemoTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,38 +28,48 @@ class MainActivity : ComponentActivity() {
         setContent {
             NavigationDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(modifier = Modifier.padding(innerPadding)) // Добавьте modifier
+                    MainScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
     }
 }
 
-// MainScreen в MainActivity.kt
 @Composable
 fun MainScreen(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(HomeScreen)
-    val onNavigation: (NavKey) -> Unit = { backStack.add(it) }
-    val onClearBackStack: () -> Unit = { while (backStack.size > 1) { backStack.removeLastOrNull() } }
+    val navController = rememberNavController()
 
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        entryProvider = entryProvider {
-            entry<HomeScreen> { Home(onNavigation) }
-            entry<WelcomeScreen> { key -> Welcome(onNavigation, key.name) }
-            entry<ProfileScreen> { Profile(onClearBackStack) }
+    NavHost(
+        navController = navController,
+        startDestination = "home",
+        modifier = modifier
+    ) {
+        composable("home") {
+            Home { name ->
+                navController.navigate("welcome/$name")
+            }
         }
-    )
+        composable(
+            "welcome/{name}",
+            arguments = listOf(navArgument("name") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            Welcome(name = name) {
+                navController.navigate("profile")
+            }
+        }
+        composable("profile") {
+            Profile {
+                navController.popBackStack("home", inclusive = false)
+            }
+        }
+    }
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
     NavigationDemoTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            MainScreen(modifier = Modifier.padding(innerPadding))
-        }
+        MainScreen(modifier = Modifier.fillMaxSize())
     }
 }
